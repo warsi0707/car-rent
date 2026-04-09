@@ -5,12 +5,6 @@ import AdminModel from "../models/admin.model.js";
 
 const JWT_COOKIE_NAME = "admin_token";
 
-const getCookieOptions = () => ({
-  httpOnly: true,
-  sameSite: "lax" as const,
-  secure: process.env.NODE_ENV === "production",
-  maxAge: 7 * 24 * 60 * 60 * 1000,
-});
 
 export const adminSignup = async (req: Request, res: Response) => {
   try {
@@ -55,19 +49,20 @@ export const adminSignup = async (req: Request, res: Response) => {
 export const adminSignin = async (req: Request, res: Response) => {
   try {
     const { email, password } = req.body || {};
+    console.log(email, password)
 
     if (!email || !password) {
-      return res.status(400).json({ message: "email and pass are required" });
+      return res.status(400).json({success: false, error: "email and pass are required" });
     }
 
     const admin = await AdminModel.findOne({email:email});
     if (!admin) {
-      return res.status(401).json({ message: "Invalid credentials" });
+      return res.status(401).json({success:false, error: "Invalid credentials" });
     }
 
     const isMatch = await bcrypt.compare(password, admin.password);
     if (!isMatch) {
-      return res.status(401).json({ message: "Invalid credentials" });
+      return res.status(401).json({success:false, error: "Invalid credentials" });
     }
     const jwtSecret = process.env.ADMIN_JWT_SECRET;
 
@@ -81,9 +76,16 @@ export const adminSignin = async (req: Request, res: Response) => {
       },
       jwtSecret,
     );
-    res.cookie(JWT_COOKIE_NAME, token, getCookieOptions());
+    res.cookie(JWT_COOKIE_NAME, token,{
+        httpOnly: true,
+        // Allow cross-site cookies when frontend sends credentials: "include"
+        sameSite: "none",
+        secure: true,
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
 
-    return res.status(200).json({
+    return res.json({
+      success: true,
       message: "Signin successful",
       admin: {
         id: admin._id,
@@ -96,18 +98,23 @@ export const adminSignin = async (req: Request, res: Response) => {
   } catch (error) {
     return res
       .status(500)
-      .json({ message: "Signin failed", error: String(error) });
+      .json({success:false, error: "Signin failed"});
   }
 };
 
 export const adminLogout = async (req: Request, res: Response) => {
   try {
-    res.clearCookie(JWT_COOKIE_NAME, getCookieOptions());
-    return res.status(200).json({ message: "Logout successful" });
+    res.clearCookie(JWT_COOKIE_NAME,{
+        httpOnly: true,
+        sameSite: "none",
+        secure: true,
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+    return res.status(200).json({success:true, message: "Logout successful" });
   } catch (error) {
     return res
       .status(500)
-      .json({ message: "Logout failed", error: String(error) });
+      .json({success:false, message: "Logout failed", error: String(error) });
   }
 };
 
@@ -150,4 +157,3 @@ export const createAdmin = async (req: Request, res: Response) => {
       .json({ message: "Create admin failed", error: String(error) });
   }
 };
-

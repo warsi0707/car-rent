@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import React from 'react'
 
 export default function Starter1() {
@@ -23,12 +24,12 @@ export default function Starter1() {
                     commutes, weekend escapes, and business travel.
                 </p>
                 <div className='mt-8 flex flex-wrap items-center justify-center gap-4 lg:justify-start'>
-                    <button className='rounded-full bg-white px-6 py-3 text-sm font-semibold text-black shadow-lg shadow-black/30 transition hover:-translate-y-0.5 hover:bg-white/90'>
+                    <Link href={"/vehicles"} className='rounded-full bg-white px-6 py-3 text-sm font-semibold text-black shadow-lg shadow-black/30 transition hover:-translate-y-0.5 hover:bg-white/90'>
                         Book now
-                    </button>
-                    <button className='rounded-full border border-white/35 px-6 py-3 text-sm font-semibold text-white transition hover:border-white hover:bg-white/10'>
+                    </Link>
+                    <Link href={"/vehicles"} className='rounded-full border border-white/35 px-6 py-3 text-sm font-semibold text-white transition hover:border-white hover:bg-white/10'>
                         Explore cars
-                    </button>
+                    </Link>
                 </div>
                 <div className='mt-8 flex flex-wrap items-center justify-center gap-6 text-sm text-white/80 lg:justify-start'>
                     <div className='flex items-center gap-3'>

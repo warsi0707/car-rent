@@ -28,6 +28,7 @@ const pickCarPayload = (source: Record<string, unknown>) => {
     'features',
     'description',
     'status',
+    'slug',
     'isActive',
     'addedBy',
   ]
@@ -44,6 +45,8 @@ const pickCarPayload = (source: Record<string, unknown>) => {
 export const createCar = async (req: Request, res: Response) => {
   try {
     const payload = pickCarPayload(req.body || {})
+    const admin = req.admin
+    console.log(payload)
 
     const required = [
       'name',
@@ -62,8 +65,18 @@ export const createCar = async (req: Request, res: Response) => {
         return res.status(400).json({ message: `${field} is required` })
       }
     }
+    const generateCardId =()=>{
+      const randomString = Math.random().toString(36).substring(2, 8);
+      return `CAR-${randomString}`;
+    }
 
-    const car = await CarModel.create(payload)
+    const car = await CarModel.create(
+      {
+        ...payload, 
+        carId:generateCardId(),
+        addedBy:req?.admin as string
+        }
+      )
 
     return res.status(201).json({
         success: true,
@@ -82,6 +95,7 @@ export const listCars = async (req: Request, res: Response) => {
     const limit = Math.min(parseNumber(req.query.limit, 20), 100)
     const offset = parseNumber(req.query.offset, 0)
     const cars = await CarModel.find().sort({ createdAt: -1 }).skip(offset).limit(limit)
+    .populate('addedBy', 'name email _id role')
     return res.status(200).json({
       cars,
       limit,
@@ -96,12 +110,12 @@ export const listCars = async (req: Request, res: Response) => {
 
 export const getCarById = async (req: Request, res: Response) => {
   try {
-    const carId = req.params.id
+    const carId = req.params.slugOrId
     if (!carId) {
       return res.status(400).json({ message: 'Invalid car id' })
     }
 
-    const car = await CarModel.findById(carId)
+    const car = await CarModel.findOne({ $or: [{ carId }, { slug: carId }] })
     if (!car) {
       return res.status(404).json({ message: 'Car not found' })
     }
@@ -116,7 +130,7 @@ export const getCarById = async (req: Request, res: Response) => {
 
 export const updateCar = async (req: Request, res: Response) => {
   try {
-    const carId = req.params.id
+    const carId = req.params.slugOrId
     if (!carId) {
       return res.status(400).json({ message: 'Invalid car id' })
     }
@@ -126,39 +140,45 @@ export const updateCar = async (req: Request, res: Response) => {
       return res.status(400).json({ message: 'No fields to update' })
     }
 
-    const car = await CarModel.findByIdAndUpdate({_id:carId}, payload, {
-      new: true,
-      runValidators: true,
-    })
+    const car = await CarModel.findOneAndUpdate(
+      { $or: [{ carId }, { slug: carId }] },
+      payload,
+      {
+        new: true,
+        runValidators: true,
+      }
+    )
 
     if (!car) {
-      return res.status(404).json({ message: 'Car not found' })
+      return res.status(404).json({success:false, message: 'Car not found' })
     }
 
     return res.status(200).json({
       message: 'Car updated successfully',
       car,
+      success: true,
     })
   } catch (error) {
     return res
       .status(500)
-      .json({ message: 'Failed to update car', error: String(error) })
+      .json({success:false, message: 'Failed to update car', error: String(error) })
   }
 }
 
 export const deleteCar = async (req: Request, res: Response) => {
   try {
-    const carId = req.params.id
+    const carId = req.params.slugOrId
     if (!carId) {
       return res.status(400).json({ message: 'Invalid car id' })
     }
 
-    const car = await CarModel.findByIdAndDelete({_id: carId})
+    const car = await CarModel.findOneAndDelete({ $or: [{ carId }, { slug: carId }] })
     if (!car) {
-      return res.status(404).json({ message: 'Car not found' })
+      return res.status(404).json({success:false, message: 'Car not found' })
     }
 
     return res.status(200).json({
+      success: true,
       message: 'Car deleted successfully',
       carId,
     })

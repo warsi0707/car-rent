@@ -1,15 +1,31 @@
+"use client"
+import { IndianRupee } from 'lucide-react'
 import Link from 'next/link'
-import React from 'react'
+import { useRouter } from 'next/navigation'
+import React, { useState } from 'react'
 
-export default function Feature() {
-  const cars = [
-    { id: 1, name: 'Audi A6', price: '$72/day', image: '/car.jpeg' },
-    { id: 2, name: 'BMW M4', price: '$89/day', image: '/car.jpeg' },
-    { id: 3, name: 'Mercedes C-Class', price: '$78/day', image: '/car.jpeg' },
-    { id: 4, name: 'Porsche 911', price: '$140/day', image: '/car.jpeg' },
-    { id: 5, name: 'Tesla Model 3', price: '$64/day', image: '/car.jpeg' },
-    { id: 6, name: 'Range Rover Evoque', price: '$96/day', image: '/car.jpeg' },
-  ]
+interface CarProp {
+  _id: string,
+  name: string,
+  pricePerDay: string,
+  images: string[],
+  slug: string
+}
+
+export default function Feature(props:any) {
+  const router = useRouter()
+  const [initialCars, setInitialCars] = useState<CarProp[]>(
+    Array.isArray(props?.cars) ? props.cars : props?.data?.cars || []
+  )
+
+  // const cars = [
+  //   { id: 1, name: 'Audi A6', price: '$72/day', image: '/car.jpeg' },
+  //   { id: 2, name: 'BMW M4', price: '$89/day', image: '/car.jpeg' },
+  //   { id: 3, name: 'Mercedes C-Class', price: '$78/day', image: '/car.jpeg' },
+  //   { id: 4, name: 'Porsche 911', price: '$140/day', image: '/car.jpeg' },
+  //   { id: 5, name: 'Tesla Model 3', price: '$64/day', image: '/car.jpeg' },
+  //   { id: 6, name: 'Range Rover Evoque', price: '$96/day', image: '/car.jpeg' },
+  // ]
 
   return (
     <section className='w-full px-6 py-16  sm:py-20'>
@@ -27,20 +43,20 @@ export default function Feature() {
               comfort, and timeless design.
             </p>
           </div>
-          <button className='inline-flex w-fit items-center justify-center rounded-full border px-5 py-2 text-sm font-semibold transition text-black'>
+          <button onClick={()=> router.push("/vehicles")} className='cursor-pointer inline-flex w-fit items-center justify-center rounded-full border px-5 py-2 text-sm font-semibold transition text-black'>
             View all
           </button>
         </div>
 
         <div className='mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3'>
-          {cars.map((car) => (
+          {initialCars && initialCars.map((car:CarProp) => (
             <Link
-              key={car.id}
-              href={`/cars/${car.id}`}
+              key={car._id}
+              href={`/vehicles/${car.slug}`}
               className='group relative overflow-hidden rounded-3xl border border-white/40 bg-white/5 transition hover:-translate-y-1 hover:border-white'
             >
               <img
-                src={car.image}
+                src={car.images[0]}
                 alt={car.name}
                 className='h-64 w-full object-cover transition duration-500 group-hover:scale-105 sm:h-72'
               />
@@ -48,8 +64,9 @@ export default function Feature() {
               <div className='absolute bottom-0 left-0 right-0 p-5'>
                 <div className='flex items-center justify-between'>
                   <h3 className='text-lg font-bold text-white'>{car.name}</h3>
-                  <span className='rounded-full border border-white/40 bg-white/10 px-3 py-1 text-xs font-semibold text-white backdrop-blur'>
-                    {car.price}
+                  <span className='rounded-full border flex items-center border-white/40 bg-white/10 px-3 py-1 text-xs font-semibold text-white backdrop-blur'>
+                    <IndianRupee className='h-3 w-3'/>
+                     {car.pricePerDay}
                   </span>
                 </div>
                 <p className='mt-2 text-xs text-white/70'>

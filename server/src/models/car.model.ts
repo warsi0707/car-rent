@@ -4,9 +4,21 @@ const currentYear = new Date().getFullYear() + 1
 
 const CarSchema = new Schema(
   {
+    carId: {
+      type: String,
+      required: true,
+      unique: true,
+    },
     name: {
       type: String,
       required: true,
+      trim: true,
+    },
+    slug: {
+      type: String,
+      required: true,
+      unique: true,
+      lowercase: true,
       trim: true,
     },
     brand: {
@@ -107,7 +119,7 @@ const CarSchema = new Schema(
     status: {
       type: String,
       required: true,
-      enum: ['available', 'booked', 'maintenance', 'inactive'],
+      enum: ['available', 'booked', 'draft','maintenance', 'inactive'],
       default: 'available',
     },
     isActive: {

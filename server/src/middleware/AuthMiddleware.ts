@@ -7,7 +7,6 @@ interface AuthRequest extends Request {
 }
 
 export const AuthRequire =async(req:Request, res:Response, next:NextFunction)=>{
-    
     const token = req.cookies.admin_token
     if(!token){
         return res.status(401).json({message:"Unauthorized"})

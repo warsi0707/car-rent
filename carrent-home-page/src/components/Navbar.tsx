@@ -45,7 +45,7 @@ export default function Navbar() {
         </div>
 
         <div className="flex items-center gap-3">
-          <button className="hidden rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-black shadow-lg shadow-black/30 transition hover:-translate-y-0.5 hover:bg-white/90 sm:inline-flex">
+          <button onClick={()=> router.push("/vehicles")} className="hidden cursor-pointer rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-black shadow-lg shadow-black/30 transition hover:-translate-y-0.5 hover:bg-white/90 sm:inline-flex">
             Book a car
           </button>
           {isSignedIn ? (

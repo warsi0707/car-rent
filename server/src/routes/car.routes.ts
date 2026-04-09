@@ -6,9 +6,13 @@ const CarRouter = express.Router()
 
 CarRouter.post("/create", AuthRequire, createCar)
 CarRouter.get("/", AuthRequire,listCars)
-CarRouter.get("/:id", AuthRequire, getCarById)
-CarRouter.patch("/update/:id", AuthRequire, updateCar)
-CarRouter.delete("/:id", AuthRequire, deleteCar)
+
+CarRouter.get("/public", listCars)
+CarRouter.get("/public/:slugOrId", getCarById)
+
+CarRouter.get("/:slugOrId", AuthRequire, getCarById)
+CarRouter.patch("/update/:slugOrId", AuthRequire, updateCar)
+CarRouter.delete("/:slugOrId", AuthRequire, deleteCar)
 
 
 

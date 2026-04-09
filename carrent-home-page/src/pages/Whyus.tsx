@@ -52,7 +52,7 @@ export default function Whyus() {
                         <p className='text-xs uppercase tracking-[0.35em] text-white/80'>
                             Premium comfort
                         </p>
-                        <h3 className='mt-3 text-2xl font-semibold'>
+                        <h3 className='mt-3 text-2xl text-white font-semibold'>
                             Curated cars with five-star maintenance
                         </h3>
                         <p className='mt-3 max-w-md text-sm text-white/85'>
