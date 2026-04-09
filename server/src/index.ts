@@ -20,7 +20,7 @@ app.use(express.json())
 app.use(cookieParser())
 
 const allowedOrigins = process.env.FRONTEND_URL?.split(",") || []
-console.log("Allowed Origins:", allowedOrigins)
+// console.log("Allowed Origins:", allowedOrigins)
 app.use(cors({
   origin: (origin, callback) => {
     if (!origin || allowedOrigins.includes(origin)) {
@@ -31,6 +31,10 @@ app.use(cors({
   },
   credentials: true
 }))
+
+app.get("/", (req, res) => {
+    res.send("Welcome to Car Rental API")
+})
 
 app.use("/api/uploader", UploaderRoutes)
 
