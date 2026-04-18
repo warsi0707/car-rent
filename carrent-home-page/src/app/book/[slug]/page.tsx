@@ -1,6 +1,7 @@
 "use client"
 import { getCar } from "@/server/car"
-import { createBooking } from "@/server/booking"
+import { createBooking, getAvailibility } from "@/server/booking"
+import { createPaymentOrder } from "@/server/payment"
 import { useUser } from "@clerk/nextjs"
 import {
   AlertCircle,
@@ -11,6 +12,7 @@ import {
   Loader2,
   MapPin,
   Plus,
+  X,
 } from "lucide-react"
 import Link from "next/link"
 import { useParams, useRouter } from "next/navigation"
@@ -64,12 +66,13 @@ export default function BookingPage() {
   const [car, setCar] = useState<Car | null>(null)
   const [carLoading, setCarLoading] = useState(true)
   const [submitting, setSubmitting] = useState(false)
-  const [success, setSuccess] = useState(false)
   const [submitError, setSubmitError] = useState<string | null>(null)
   const [addons, setAddons] = useState<IAddon[]>([])
 
   const todayISO = new Date().toISOString().split("T")[0]
   const tomorrowISO = new Date(Date.now() + 86_400_000).toISOString().split("T")[0]
+  const [isAvailable, setIsAvailable] = useState<Boolean>(true)
+  console.log("Is avaail: ", isAvailable)
 
   const [form, setForm] = useState({
     startDate: todayISO,
@@ -94,6 +97,16 @@ export default function BookingPage() {
       console.log("Error while laoding addons")
     }
   }
+  const handleGetAvailibility = async()=>{
+    const res = await getAvailibility((slug as string),form.startDate,form.endDate)
+    console.log(res)
+    if(res.success){
+      setIsAvailable(res.isAvailable)
+    }
+  }
+  useEffect(()=>{
+    handleGetAvailibility()
+  },[slug, form.startDate, form.endDate])
   useEffect(()=>{
     handleGetAddons()
   },[slug])
@@ -165,7 +178,8 @@ export default function BookingPage() {
 
     setSubmitting(true)
     try {
-      await createBooking({
+      // Step 1: Create booking (pending / unpaid)
+      const bookingRes = await createBooking({
         carSlug: car!.slug,
         userClerkId: user.id,
         userEmail: user.primaryEmailAddress?.emailAddress ?? "",
@@ -180,19 +194,41 @@ export default function BookingPage() {
         notes: form.notes,
         securityDeposit: SECURITY_DEPOSIT,
       })
-      setSuccess(true)
+
+      const bookingId: string = bookingRes.booking._id
+
+      // Step 2: Create Cashfree payment order
+      const paymentRes = await createPaymentOrder({
+        amount: grandTotal,
+        customerId: user.id,
+        customerName: user.fullName ?? "Customer",
+        customerEmail: user.primaryEmailAddress?.emailAddress ?? "",
+        customerPhone:
+          (user.phoneNumbers?.[0]?.phoneNumber as string | undefined) ??
+          "9999999999",
+        bookingId,
+      })
+
+      const paymentSessionId: string | undefined =
+        paymentRes.data?.payment_session_id
+      if (!paymentSessionId)
+        throw new Error("Payment session could not be created")
+
+      // Step 3: Redirect to Cashfree checkout
+      const { load } = await import("@cashfreepayments/cashfree-js")
+      const cashfree = await load({ mode: "sandbox" })
+      cashfree.checkout({ paymentSessionId, redirectTarget: "_self" })
+      // Page will redirect — don't reset submitting
     } catch (err: unknown) {
       setSubmitError(
         err instanceof Error ? err.message : "Booking failed. Please try again."
       )
-    } finally {
       setSubmitting(false)
     }
   }
 
   if (carLoading || !clerkLoaded) return <LoadingSkeleton />
   if (!car) return <CarNotFound />
-  if (success) return <SuccessState car={car} />
 
   const minEndDate = new Date(new Date(form.startDate).getTime() + 86_400_000)
     .toISOString()
@@ -201,7 +237,7 @@ export default function BookingPage() {
   return (
     <main className="min-h-screen w-full bg-slate-50 pb-32 text-slate-900 sm:pb-0">
       {/* Header */}
-      <div className="bg-slate-950 px-6 pt-24 pb-10">
+      <div className="bg-slate-950 px-6 pt-10 pb-10">
         <div className="mx-auto max-w-6xl">
           <Link
             href={`/vehicles/${car.slug}`}
@@ -268,7 +304,27 @@ export default function BookingPage() {
                     onChange={v => setForm(f => ({ ...f, endDate: v }))}
                   />
                 </div>
-
+                {isAvailable == true ?
+                <div className="mt-4 flex items-center gap-3 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3">
+                    <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-600" />
+                    <p className="text-sm text-emerald-800">
+                      <span>Available </span>
+                      {/* <span className="font-semibold">
+                        {new Date(form.startDate).toLocaleDateString()} - {new Date(form.endDate).toLocaleDateString()}
+                      </span>{" "} */}
+                    </p>
+                  </div> :
+                  <div className="mt-4 flex items-center gap-3 rounded-2xl border border-red-200 bg-red-50 px-4 py-3">
+                    <X className="h-4 w-4 shrink-0 text-red-600" />
+                    <p className="text-sm text-red-800">
+                      <span>Not available on </span>
+                      <span className="font-semibold">
+                        {new Date(form.startDate).toLocaleDateString()} - {new Date(form.endDate).toLocaleDateString()}
+                      </span>{" "}
+                      
+                    </p>
+                  </div>
+                  }
                 {totalDays > 0 && (
                   <div className="mt-4 flex items-center gap-3 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3">
                     <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-600" />
@@ -283,6 +339,7 @@ export default function BookingPage() {
                     </p>
                   </div>
                 )}
+                
               </FormSection>
 
               {/* 02 Location */}
@@ -574,8 +631,8 @@ export default function BookingPage() {
                 {/* CTA */}
                 <button
                   type="submit"
-                  disabled={submitting || totalDays <= 0 || !isSignedIn}
-                  className="w-full rounded-full bg-slate-900 px-6 py-4 text-sm font-semibold text-white shadow-lg shadow-slate-400/20 transition hover:-translate-y-0.5 hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0"
+                  disabled={submitting || totalDays <= 0 || !isSignedIn || !isAvailable}
+                  className="w-full cursor-pointer rounded-full bg-slate-900 px-6 py-4 text-sm font-semibold text-white shadow-lg shadow-slate-400/20 transition hover:-translate-y-0.5 hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0"
                 >
                   {submitting ? (
                     <span className="flex items-center justify-center gap-2">
@@ -583,7 +640,7 @@ export default function BookingPage() {
                       Processing...
                     </span>
                   ) : (
-                    "Confirm booking"
+                    isAvailable? "Confirm booking": "Not Available"
                   )}
                 </button>
                 <p className="text-center text-xs text-slate-400">

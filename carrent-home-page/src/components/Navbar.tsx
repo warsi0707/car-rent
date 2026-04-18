@@ -8,7 +8,6 @@ import { User } from "lucide-react";
 export default function Navbar() {
   const { user, isSignedIn } = useUser();
   const { signOut } = useClerk();
-  console.log(user);
   const router = useRouter();
   const navItems = [
     { id: 1, name: "Vehicles", href: "/vehicles" },
@@ -24,7 +23,7 @@ export default function Navbar() {
   const [isMobileOpen, setIsMobileOpen] = React.useState(false);
 
   return (
-    <nav className="absolute top-0 z-20 w-full text-white">
+    <nav className="fixed top-0 z-40 w-full bg-slate-950/90 backdrop-blur-md text-white border-b border-white/5 shadow-lg shadow-black/20">
       <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-5">
         <Link href={"/"} className="text-lg font-semibold tracking-wide">
           <span className="rounded-md border border-white/20 bg-white/10 px-3 py-1.5 backdrop-blur-sm">
@@ -45,9 +44,13 @@ export default function Navbar() {
         </div>
 
         <div className="flex items-center gap-3">
+          {isSignedIn ?
+          <button onClick={()=> router.push("/bookings")} className="hidden cursor-pointer rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-black shadow-lg shadow-black/30 transition hover:-translate-y-0.5 hover:bg-white/90 sm:inline-flex">
+            Bookings
+          </button>:
           <button onClick={()=> router.push("/vehicles")} className="hidden cursor-pointer rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-black shadow-lg shadow-black/30 transition hover:-translate-y-0.5 hover:bg-white/90 sm:inline-flex">
             Book a car
-          </button>
+          </button>}
           {isSignedIn ? (
             <div className="relative">
               <button
@@ -126,9 +129,12 @@ export default function Navbar() {
             </div>
 
             <div className="mt-4 flex flex-col gap-3">
-              <button className="w-full rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-black shadow-lg shadow-black/30 transition hover:-translate-y-0.5 hover:bg-white/90">
+              {isSignedIn ? <button onClick={()=> router.push("/bookings")} className="w-full rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-black shadow-lg shadow-black/30 transition hover:-translate-y-0.5 hover:bg-white/90">
+                Bookings
+              </button>:
+              <button onClick={()=> router.push("/vehicles")} className="w-full rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-black shadow-lg shadow-black/30 transition hover:-translate-y-0.5 hover:bg-white/90">
                 Book a car
-              </button>
+              </button>}
               {!isSignedIn && (
                 <button
                   onClick={() => router.push("/sign-in")}

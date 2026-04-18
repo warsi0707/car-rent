@@ -170,7 +170,8 @@ export default function CarHome({ cars = [] }: CarHomeProps) {
                     </button>
                     <button
                       type="button"
-                      className="rounded-md text-xs font-medium text-slate-700 transition hover:border-slate-300 hover:bg-slate-50"
+                      onClick={() => router.push(`/cars/${car.slug}/edit`)}
+                      className="rounded-md text-xs font-medium text-slate-700 transition hover:border-slate-300 hover:bg-slate-50 cursor-pointer"
                     >
                       <Pencil className='h-5 w-5'/>
                     </button>

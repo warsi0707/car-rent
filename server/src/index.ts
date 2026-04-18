@@ -12,6 +12,8 @@ import multer from 'multer'
 import UploaderRoutes from './routes/uploader.routes.js'
 import cors from 'cors'
 import AddOnRouter from './routes/addons.routes.js'
+import PaymentRouter from './routes/payment.routes.js'
+import UserRouter from './routes/user.routes.js'
 
 const app = express()
 
@@ -42,6 +44,9 @@ app.use("/api/admin/auth", AuthRouter)
 app.use("/api/admin/cars", CarRouter)
 app.use("/api/admin/bookings", BookingRouter)
 app.use("/api/addons", AddOnRouter)
+app.use("/api/cars", CarRouter)
+app.use("/api/payment", PaymentRouter)
+app.use("/api/admin/users", UserRouter)
 
 
 const main =async()=>{

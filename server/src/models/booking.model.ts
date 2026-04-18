@@ -85,6 +85,11 @@ const BookingSchema = new Schema(
       type: String,
       trim: true,
     },
+    cashfreeOrderId: {
+      type: String,
+      trim: true,
+      index: true,
+    },
     pickup: {
       city: { type: String, trim: true },
       state: { type: String, trim: true },
@@ -115,6 +120,6 @@ const BookingSchema = new Schema(
 
 export type Booking = InferSchemaType<typeof BookingSchema>
 
-const BookingModel = mongoose.models.Booking || model('Booking', BookingSchema)
+const BookingModel = (mongoose.models.Booking || model('Booking', BookingSchema)) as mongoose.Model<Booking>
 
 export default BookingModel

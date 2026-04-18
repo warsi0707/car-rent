@@ -119,8 +119,8 @@ const CarSchema = new Schema(
     status: {
       type: String,
       required: true,
-      enum: ['available', 'booked', 'draft','maintenance', 'inactive'],
-      default: 'available',
+      enum: ['active', 'draft','maintenance', 'inactive'],
+      default: 'active',
     },
     isActive: {
       type: Boolean,

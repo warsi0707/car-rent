@@ -27,3 +27,33 @@ export const createBooking = async (data: CreateBookingPayload) => {
   }
   return res.json()
 }
+
+export const getAvailibility = async (carSlug: string, startDate: string, endDate: string) => {
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_BACKEND_URL}/cars/available?carSlug=${carSlug}&startDate=${startDate}&endDate=${endDate}`,
+    {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' },
+    }
+  )
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ message: 'Failed to check availability' }))
+    throw new Error(err.message || 'Failed to check availability')
+  }
+  return res.json()
+}
+
+export const getBookings = async (userId:string) => {
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_BACKEND_URL}/admin/bookings/user/${userId}`,
+    {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' },
+    }
+  )
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ message: 'Failed to fetch bookings' }))
+    throw new Error(err.message || 'Failed to fetch bookings')
+  }
+  return res.json()
+}

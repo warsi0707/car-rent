@@ -33,7 +33,7 @@ const initialCarData = {
   features: [],
   images: [],
   description: '',
-  status: 'available',
+  status: 'active',
   isActive: true,
 } 
 
@@ -87,7 +87,7 @@ export default function EditCarPage() {
             features: car.features || [],
             images: car.images || [],
             description: car.description || '',
-            status: car.status || 'available',
+            status: car.status || 'active',
             isActive: car.isActive !== undefined ? car.isActive : true,
           })
         } else {
@@ -559,7 +559,7 @@ export default function EditCarPage() {
               <div className="space-y-2">
                 <label className="text-sm font-medium text-slate-700">Availability</label>
                 <select name="status" value={carData.status} onChange={handleChange} className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm text-slate-900 focus:border-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-200">
-                  <option value="available">Available</option>
+                  <option value="active">Active</option>
                   <option value="booked">Booked</option>
                   <option value="maintenance">Maintenance</option>
                   <option value="inactive">Inactive</option>

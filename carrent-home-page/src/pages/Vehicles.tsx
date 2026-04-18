@@ -39,9 +39,7 @@ export interface ICar {
 export default function Vehicles() {
     const [currentPage, setCurrentPage] = useState(1)
     const [cars, setCars] = useState<ICar[]>([])
-    console.log(cars)
     const [hasMore, setHasMore] = useState(true)
-    console.log(hasMore)
     const [isLoading, setIsLoading] = useState(false)
 
     const handleGetCars = useCallback(async () => {

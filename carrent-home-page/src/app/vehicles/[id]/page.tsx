@@ -73,10 +73,9 @@ export default function CarDetailPage() {
     ;(async () => {
       try {
         const data = await getCar(id)
-        console.log(data)
         setCar(data)
       } catch (e) {
-        console.error(e)
+     
       } finally {
         setLoading(false)
       }
@@ -112,11 +111,11 @@ export default function CarDetailPage() {
                 <span className="rounded-full bg-white/10 px-3 py-1 text-xs font-semibold text-white/80">
                   {car.year}
                 </span>
-                <span
+                {/* <span
                   className={`rounded-full border px-3 py-1 text-xs font-semibold capitalize ${statusClass}`}
                 >
                   {car.status}
-                </span>
+                </span> */}
               </div>
               <h1 className="mt-3 text-3xl font-bold text-white sm:text-4xl">
                 {car.brand} {car.model}
@@ -129,7 +128,7 @@ export default function CarDetailPage() {
                 Per day
               </p>
               <p className="mt-1 text-4xl font-bold text-white">
-                {currency} {car.pricePerDay.toLocaleString()}
+                ₹{car.pricePerDay.toLocaleString()}
               </p>
             </div>
           </div>
@@ -281,35 +280,35 @@ export default function CarDetailPage() {
                       Price per day
                     </p>
                     <p className="mt-1 text-3xl font-bold text-slate-900">
-                      {currency} {car.pricePerDay.toLocaleString()}
+                      ₹{car.pricePerDay.toLocaleString()}
                     </p>
                   </div>
-                  <span
+                  {/* <span
                     className={`rounded-full border px-3 py-1 text-xs font-semibold capitalize ${statusClass}`}
                   >
                     {car.status}
-                  </span>
+                  </span> */}
                 </div>
 
                 <div className="mt-6 space-y-3">
                   <div className="flex items-center justify-between rounded-2xl bg-slate-50 px-4 py-3 text-sm">
                     <span className="text-slate-600">Daily rate</span>
                     <span className="font-semibold text-slate-900">
-                      {currency} {car.pricePerDay.toLocaleString()}
+                      ₹{currency} {car.pricePerDay.toLocaleString()}
                     </span>
                   </div>
                   <div className="flex items-center justify-between rounded-2xl bg-slate-50 px-4 py-3 text-sm">
                     <span className="text-slate-600">Security deposit</span>
                     <span className="font-semibold text-slate-900">
-                      {currency} 5,000
+                      ₹5,000
                     </span>
                   </div>
                   <div className="flex items-center justify-between rounded-2xl bg-slate-50 px-4 py-3 text-sm">
                     <span className="text-slate-600">Availability</span>
                     <span
-                      className={`font-semibold capitalize ${
-                        isAvailable ? "text-emerald-600" : "text-orange-600"
-                      }`}
+                      // className={`font-semibold capitalize ${
+                      //   isAvailable ? "text-emerald-600" : "text-orange-600"
+                      // }`}
                     >
                       {car.status}
                     </span>
@@ -318,10 +317,11 @@ export default function CarDetailPage() {
 
                 <button
                 onClick={()=> router.push(`/book/${car.slug}`)}
-                  disabled={!isAvailable}
+                  // disabled={!isAvailable}
                   className="mt-6 w-full cursor-pointer rounded-full bg-slate-900 px-6 py-3.5 text-sm font-semibold text-white shadow-lg shadow-slate-400/30 transition hover:-translate-y-0.5 hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0"
                 >
-                  {isAvailable ? "Book this car" : "Currently unavailable"}
+                  {/* {isAvailable ? "Book this car" : "Currently unavailable"} */}
+                  Book this car
                 </button>
                 <button className="mt-3 w-full rounded-full border border-slate-300 px-6 py-3 text-sm font-semibold text-slate-900 transition hover:border-slate-500 hover:bg-slate-50">
                   Save to wishlist
@@ -361,15 +361,16 @@ export default function CarDetailPage() {
           <div>
             <p className="text-xs text-slate-500">Per day</p>
             <p className="text-xl font-bold text-slate-900">
-              {currency} {car.pricePerDay.toLocaleString()}
+              ₹ {car.pricePerDay.toLocaleString()}
             </p>
           </div>
           <button
           onClick={()=> router.push(`/book/${car.slug}`)}
-            disabled={!isAvailable}
+            // disabled={!isAvailable}
             className="rounded-full bg-slate-900 px-8 py-3 text-sm font-semibold text-white transition hover:bg-slate-800 disabled:opacity-50"
           >
-            {isAvailable ? "Book now" : "Unavailable"}
+            {/* {isAvailable ? "Book now" : "Unavailable"} */}
+            Book now
           </button>
         </div>
       </div>

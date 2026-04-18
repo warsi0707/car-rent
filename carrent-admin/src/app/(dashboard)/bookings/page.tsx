@@ -1,7 +1,7 @@
-import React from 'react'
+import BookingsPage from '@/pages/BookingsPage'
+import { getBookings } from '@/server/booking'
 
-export default function page() {
-  return (
-    <div>page</div>
-  )
+export default async function page() {
+  const res = await getBookings()
+  return <BookingsPage bookings={res.bookings ?? []} />
 }
