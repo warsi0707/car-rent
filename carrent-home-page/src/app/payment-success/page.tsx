@@ -41,7 +41,7 @@ type VerifyResult =
 
 function PaymentSuccessContent() {
   const searchParams = useSearchParams()
-  const orderId = searchParams.get("order_id")
+  const orderId = searchParams?.get("order_id")
   const [result, setResult] = useState<VerifyResult>({ state: "loading" })
 
   useEffect(() => {
