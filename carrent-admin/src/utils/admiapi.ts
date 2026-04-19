@@ -4,6 +4,7 @@ const adminApi =async (url:any, data:any, method:any)=>{
         headers: {
             'Content-Type': 'application/json'
         },
+        credentials: 'include',
         body: JSON.stringify(data)
     })
     const result = await res.json()

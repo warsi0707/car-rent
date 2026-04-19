@@ -20,11 +20,12 @@ export const signIn = async (data:any) => {
 
 export const signUp =async(data: any)=>{
     console.log(process.env.NEXT_BACKEND_URL)
-    const res = await fetch(`${process.env.NEXT_BACKEND_URL}/admin/auth/signup`, {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/admin/auth/signup`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
+        credentials: 'include',
         body: JSON.stringify(data)
     })
     const result = await res.json()

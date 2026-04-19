@@ -21,17 +21,24 @@ const app = express()
 app.use(express.json())
 app.use(cookieParser())
 
-const allowedOrigins = process.env.FRONTEND_URL?.split(",") || []
-// console.log("Allowed Origins:", allowedOrigins)
+const allowedOrigins = process.env.FRONTEND_URL?.split(",").map((url: string) => url.trim()) || []
+console.log("Allowed Origins:", allowedOrigins)
 app.use(cors({
   origin: (origin, callback) => {
+    console.log("CORS Origin:", origin) // Log the incoming origin for debugging
+    // Allow requests with no origin (like mobile apps, curl requests)
+    // or if origin is in allowed list
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true)
     } else {
+      console.error("CORS blocked origin:", origin)
       callback(new Error("CORS not allowed"))
     }
   },
-  credentials: true
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+  maxAge: 86400
 }))
 
 app.get("/", (req, res) => {
